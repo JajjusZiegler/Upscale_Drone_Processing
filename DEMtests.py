@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-"""""
+"""
 This script processes images captured by DJI Zenmuse P1 (gimbal 1) and MicaSense RedEdge-MX/Dual (gimbal 2) sensors 
 using the Matrice 300 RTK drone system. It assumes a specific folder structure as per TERN protocols and provides 
 options to override raw data paths.
+
 The script performs the following tasks:
 1. Adds RGB and multispectral images to the Metashape project.
 2. Stops for user input on calibration images.
@@ -16,54 +17,29 @@ The script performs the following tasks:
     - Smoothing and exporting models.
     - Building and exporting orthomosaics.
     - Calibrating reflectance for multispectral images.
+
 Functions:
+    - setup_logging(project_path): Configures logging to file and console.
     - cartesian_to_geog(X, Y, Z): Converts Cartesian coordinates to geographic coordinates using WGS84 ellipsoid.
     - find_files(folder, types): Finds files of specified types in a folder.
-    - copyBoundingBox(from_chunk_label, to_chunk_labels): Copies bounding box from one chunk to others.
+    - copyBoundingBox(from_chunk_label, to_chunk_label): Copies bounding box from one chunk to others.
+    - export_rgb_dem_ortho(chunk, proj_file, dem_resolutions, ortho_resolution): Exports DEMs and orthomosaics at different resolutions.
+    - process_multispec_ortho_from_dems(chunk, proj_file, rgb_dem_files, ortho_resolution): Builds multispectral orthomosaics using RGB DEMs.
     - proc_rgb(): Processes RGB images to create orthomosaic and 3D model.
-    - proc_multispec(): Processes multispectral images to create orthomosaic with relative reflectance.
+    - proc_multispec(rgb_dem_files): Processes multispectral images to create orthomosaic with relative reflectance.
+    - write_arguments_to_csv(): Logs arguments to a CSV file for debugging.
     - resume_proc(): Resumes processing after user input on calibration images.
+
 Usage:
-    Run the script with the required and optional inputs as arguments. Follow the instructions in the console to 
-    complete the calibration steps and resume processing.
-"""""
-"""
-Created August 2021
+    Run the script with the required and optional inputs as arguments. Follow the instructions in the read me file
 
-@author: Poornima Sivanandam
+Run it with the RunScript.py script to process multiple projects with an input csv.
 
-Script to process DJI Zenmuse P1 (gimbal 1) and MicaSense RedEdge-MX/Dual (gimbal 2) images captured simultaneously
-using the Matrice 300 RTK drone system.
+Created February 2025
 
-Assumption that folder structure is as per the TERN protocols:
-Data |	Path | Example
-Raw data |	<plot>/YYYYMMDD/imagery/<sensor>/level0_raw/ |	SASMDD0001/20220519/imagery/rgb/level0_raw
-Data products |	<plot>/YYYYMMDD/imagery/<sensor>/level1_proc/	| SASMDD0001/20220519/imagery/multispec/level1_proc
-Metashape project |	plot/YYYYMMDD/imagery/metashape| SASRIV0001/20220516/imagery/metashape/
-DRTK logs | plot/YYYYMMDD/drtk/
+@orignal author: Poornima Sivanandam
+@Adjusted for UPSCALE by Jan Ziegler
 
-Raw data paths can be overriden using 'Optional Inputs'.
-
-Required Input:
-    -crs "<EPSG code for target projected coordinate reference system. Also used in MicaSense position interpolation>"
-    Example: -crs "7855"
-    See https://epsg.org/home.html
-
-Optional Inputs:
-    1. -multispec "path to multispectral level0_raw folder containing raw data"
-        Default is relative to project location: ../multispec/level0_raw/
-    2. -rgb "path to RGB level0_raw folder which also has the MRK file(s)"
-        Default is relative to project location: ../rgb/level0_raw/
-    3. -smooth "<low/medium/high>"
-        Strength value to smooth RGB model. Default is low.
-        Low: for low-lying vegetation (grasslands, shrublands), Medium and high: as appropriate for forested sites.
-    4. When P1 (RGB camera) coordinates have to be blockshifted:
-        - Path to file containing DRTK init and AUSPOS cartesian coords passed using "-drtk <path to file>".
-
-Summary:
-    * Add RGB and multispectral images.
-    * Stop script for user input on calibration images.
-    * When 'Resume Processing' is clicked complete the processing workflow.
 
 """
 
@@ -91,7 +67,7 @@ from pathlib import Path
 
 # Note: External modules imported were installed through:
 # "C:\Program Files\Agisoft\Metashape Pro\python\python.exe" -m pip install <modulename>
-# See M300 data processing protocol for more information.
+# See M300 data processing protocol (TERN) for more information.
 
 # Metashape Python API updates in v2.0
 METASHAPE_V2_PLUS = False
