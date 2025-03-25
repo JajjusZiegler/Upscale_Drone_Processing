@@ -1,4 +1,5 @@
-## Upscale Drone Processing: RGB and Multispectral Imagery Processing in Agisoft Metashape Pro
+## Upscale Drone Processing: 
+## RGB and Multispectral Imagery Processing in Agisoft Metashape Pro
 
 ## Table of Contents
 - [Introduction](#introduction)
@@ -25,13 +26,13 @@ These workflows were developed for RGB and multispectral imagery collected simul
 2. Install required dependencies:
    ```bash
    cd Upscale_Drone_Processing
-   pip install -r requirements.txt
+   pip install -r requirements.txt #to be added
    ```
 
 ## Usage
 
 ### Automated Processing Workflow
-Uses scripts `RunScript.py`, `UpscaleProcessing.py` , `upd_micasense_pos.py` and `CreatUpscaleProjects.py`. 
+Uses scripts `RunScript.py`, `UpscaleProcessing.py` , `upd_micasense_pos_filename.py` and `CreatUpscaleProjects.py`. 
 - Run `CreatUpscaleProjects.py` to create Metashape projects with a CSV input file.
 - Place `OpenProjectsfromCSV.py` in the `C:\Program Files\Agisoft\Metashape Pro\scripts` folder. Open Metahape and run the script Select Project from CSV. Select the reflectance Panel images and detect the panel masks. Click on a new project to open the next project.
 - Run `RunScript.py`to complete the processing workflow.
@@ -49,9 +50,7 @@ To run the `UpscaleProcessing` script:
    python UpscaleProcessing.py -proj_path <path_to_project_file> -date <YYYYMMDD> -site <site_name> -crs <EPSG_code>
    ```
 
-### Other Examples
-- `examples/metashape_blockshift.py`: Code to perform the block shift of images in a Metashape chunk using AUSPOS results.
-- `examples/metashape_proc_p1.py`: Process RGB images captured using Zenmuse P1 on **gimbal 1 of dual mount**. **Remove the GPS/INS offset code if P1 was on single mount gimbal.**
+
 
 ## Funding
 This project was funded by TERN Landscapes.
